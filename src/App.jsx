@@ -15,6 +15,13 @@ export default function App() {
   // Dono arrays ko combine kar lo:
   const ALL_PRODUCTS = [...PRODUCTS, ...ITEMS];
 
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  // Unique categories nikalne ke liye Set ka use
+  const categories = ["All", ...new Set(ALL_PRODUCTS.map((p) => p.category))];
+
+  const filteredProducts = selectedCategory === "All" ? ALL_PRODUCTS : ALL_PRODUCTS.filter((p) => p.category === selectedCategory);
+
   // Handler: Cart me product add karna
   const handleAddToCart = (product) => {
     setCart((prevCart) => {
@@ -78,6 +85,21 @@ export default function App() {
         </button>
       </header>
 
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 mt-3">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-4 py-1.5 rounded-full text-xs font-medium transition ${selectedCategory === cat
+                ? "bg-indigo-600 text-white shadow-sm"
+                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
       {/* Main Catalog View */}
       <main className="max-w-6xl mx-auto px-6 py-10">
         <div className="flex justify-between items-end mb-6">
@@ -88,12 +110,12 @@ export default function App() {
             </p>
           </div>
           <span className="text-sm text-slate-400 font-medium">
-            {ALL_PRODUCTS.length} items
+            {filteredProducts.length} items
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {ALL_PRODUCTS.map((item) => (
+          {filteredProducts.map((item) => (
             <ProductCard
               key={item.id}
               product={item}
