@@ -17,10 +17,18 @@ export default function App() {
 
   const [selectedCategory, setSelectedCategory] = useState("All");
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   // Unique categories nikalne ke liye Set ka use
   const categories = ["All", ...new Set(ALL_PRODUCTS.map((p) => p.category))];
 
-  const filteredProducts = selectedCategory === "All" ? ALL_PRODUCTS : ALL_PRODUCTS.filter((p) => p.category === selectedCategory);
+  const filteredProducts = ALL_PRODUCTS.filter((item) => {
+    const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
+    const matchesSearch = item.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   // Handler: Cart me product add karna
   const handleAddToCart = (product) => {
@@ -91,14 +99,21 @@ export default function App() {
             key={cat}
             onClick={() => setSelectedCategory(cat)}
             className={`px-4 py-1.5 rounded-full text-xs font-medium transition ${selectedCategory === cat
-                ? "bg-indigo-600 text-white shadow-sm"
-                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+              ? "bg-indigo-600 text-white shadow-sm"
+              : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
               }`}
           >
             {cat}
           </button>
         ))}
       </div>
+
+      <input type="text"
+        placeholder="Search products..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="px-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-64 ml-2"
+      />
 
       {/* Main Catalog View */}
       <main className="max-w-6xl mx-auto px-6 py-10">
