@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { PRODUCTS } from './data/products';
+import { ITEMS } from './data/items';
 import ProductCard from './components/ProductCard';
 import CartDrawer from './components/CartDrawer';
 
@@ -10,6 +11,9 @@ export default function App() {
 
   // State 2: Cart items array
   const [cart, setCart] = useState([]);
+
+  // Dono arrays ko combine kar lo:
+  const ALL_PRODUCTS = [...PRODUCTS, ...ITEMS];
 
   // Handler: Cart me product add karna
   const handleAddToCart = (product) => {
@@ -84,12 +88,12 @@ export default function App() {
             </p>
           </div>
           <span className="text-sm text-slate-400 font-medium">
-            {PRODUCTS.length} items
+            {ALL_PRODUCTS.length} items
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {PRODUCTS.map((item) => (
+          {ALL_PRODUCTS.map((item) => (
             <ProductCard
               key={item.id}
               product={item}
