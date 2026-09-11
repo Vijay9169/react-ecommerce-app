@@ -130,13 +130,22 @@ export default function App() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((item) => (
-            <ProductCard
-              key={item.id}
-              product={item}
-              onAddToCart={handleAddToCart}
-            />
-          ))}
+
+          {filteredProducts.length === 0 ? (
+            <div className="col-span-full py-12 text-center text-slate-400">
+              <p className="text-base font-semibold text-slate-600">No products found</p>
+              <p className="text-xs mt-1">Try searching for a different keyword or category.</p>
+            </div>
+          ) : (
+            filteredProducts.map((item) => (
+              <ProductCard
+                key={item.id}
+                product={item}
+                onAddToCart={handleAddToCart}
+              />
+            ))
+          )}
+
         </div>
       </main>
 
