@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Heart } from 'lucide-react';
 import { PRODUCTS } from './data/products';
 import { ITEMS } from './data/items';
 import ProductCard from './components/ProductCard';
@@ -21,6 +21,9 @@ export default function App() {
 
   // State for Sorting (default value: "default")
   const [sortBy, setSortBy] = useState("default");
+
+  // State: Wishlist me save ki gayi product IDs ka array
+  const [wishlist, setWishlist] = useState([]);
 
   // Unique categories nikalne ke liye Set ka use
   const categories = ["All", ...new Set(ALL_PRODUCTS.map((p) => p.category))];
@@ -85,12 +88,26 @@ export default function App() {
     setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
   };
 
+  // Handler: ID ko add ya remove (toggle) karne ka logic
+  const handleToggleWishlist = (productId) => {
+    setWishlist((prevWishlist) => {
+      if (prevWishlist.includes(productId)) {
+        // Agar pehle se hai to filter karke hata do
+        return prevWishlist.filter((id) => id !== productId);
+      } else {
+        // Agar nahi hai to purane array me naya id jod do
+        return [...prevWishlist, productId];
+      }
+    });
+  };
+
   const totalCartBadgeCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       {/* Top Navbar */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-10 shadow-sm flex items-center justify-between">
+        
         <div className="flex items-center gap-2">
           <ShoppingBag className="text-indigo-600" size={26} />
           <span className="text-xl font-bold tracking-tight text-slate-800">
@@ -98,17 +115,29 @@ export default function App() {
           </span>
         </div>
 
-        {/* Cart Trigger Button */}
-        <button
-          onClick={() => setIsCartOpen(true)}
-          className="relative bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition flex items-center gap-2 shadow-sm active:scale-95"
-        >
-          <ShoppingBag size={18} />
-          <span>Cart</span>
-          <span className="bg-indigo-500 text-xs px-2 py-0.5 rounded-full font-bold ml-1">
-            {totalCartBadgeCount}
-          </span>
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Wishlist Indicator Button */}
+          <div className="flex items-center gap-1.5 bg-rose-50 text-rose-600 px-3 py-2 rounded-lg text-sm font-semibold border border-rose-100">
+            <Heart size={18} className={wishlist.length > 0 ? "fill-rose-500 text-rose-500" : "text-rose-400"} />
+            <span>Wishlist</span>
+            <span className="bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full font-bold ml-1">
+              {wishlist.length}
+            </span>
+          </div>
+        
+          {/* Cart Trigger Button */}
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="relative bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition flex items-center gap-2 shadow-sm active:scale-95"
+          >
+            <ShoppingBag size={18} />
+            <span>Cart</span>
+            <span className="bg-indigo-500 text-xs px-2 py-0.5 rounded-full font-bold ml-1">
+              {totalCartBadgeCount}
+            </span>
+          </button>
+        </div>
+
       </header>
 
       {/* Centered Category Buttons Container */}
@@ -190,6 +219,8 @@ export default function App() {
                 key={item.id}
                 product={item}
                 onAddToCart={handleAddToCart}
+                isWishlisted={wishlist.includes(item.id)}
+                onToggleWishlist={handleToggleWishlist}
               />
             ))
           )}
@@ -206,6 +237,7 @@ export default function App() {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
       />
+
     </div>
   );
 }
