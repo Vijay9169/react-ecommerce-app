@@ -19,15 +19,33 @@ export default function App() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
+  // State for Sorting (default value: "default")
+  const [sortBy, setSortBy] = useState("default");
+
   // Unique categories nikalne ke liye Set ka use
   const categories = ["All", ...new Set(ALL_PRODUCTS.map((p) => p.category))];
 
+  //Category + Search filter
   const filteredProducts = ALL_PRODUCTS.filter((item) => {
     const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
     const matchesSearch = item.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
+  });
+
+  // LOGIC: Filtered array ko sort karo
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortBy === "price-low") {
+      return a.price - b.price; // Saste se mehnga (Ascending)
+    }
+    if (sortBy === "price-high") {
+      return b.price - a.price; // Mehange se sasta (Descending)
+    }
+    if (sortBy === "rating-high") {
+      return b.rating - a.rating; // Sabse achhi rating pehle
+    }
+    return 0; // "default" par koi chhed-chhad nahi, jaisa hai waisa hi rahe
   });
 
   // Handler: Cart me product add karna
@@ -93,27 +111,57 @@ export default function App() {
         </button>
       </header>
 
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 mt-3">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-4 py-1.5 rounded-full text-xs font-medium transition ${selectedCategory === cat
-              ? "bg-indigo-600 text-white shadow-sm"
-              : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+      {/* Centered Category Buttons Container */}
+      <div className="max-w-6xl mx-auto px-6 mb-6">
+        <div className="flex gap-2 items-center justify-center flex-wrap pb-2 mt-4">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-4 py-1.5 rounded-full text-xs font-medium transition ${
+                selectedCategory === cat
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
               }`}
-          >
-            {cat}
-          </button>
-        ))}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <input type="text"
-        placeholder="Search products..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="px-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-64 ml-2"
-      />
+      {/* Left & Right spacing ke liye: max-w-6xl mx-auto px-6 */}
+      <div className="max-w-6xl mx-auto px-6 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          
+          {/* Search Box */}
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-72"
+          />
+      
+          {/* Sort Dropdown */}
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              SORT BY:
+            </span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+            >
+              <option value="default">Featured (Default)</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="rating-high">Rating: High to Low</option>
+            </select>
+          </div>
+      
+        </div>
+      </div>
 
       {/* Main Catalog View */}
       <main className="max-w-6xl mx-auto px-6 py-10">
@@ -131,13 +179,13 @@ export default function App() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-          {filteredProducts.length === 0 ? (
+          {sortedProducts.length === 0 ? (
             <div className="col-span-full py-12 text-center text-slate-400">
               <p className="text-base font-semibold text-slate-600">No products found</p>
               <p className="text-xs mt-1">Try searching for a different keyword or category.</p>
             </div>
           ) : (
-            filteredProducts.map((item) => (
+            sortedProducts.map((item) => (
               <ProductCard
                 key={item.id}
                 product={item}
@@ -147,6 +195,7 @@ export default function App() {
           )}
 
         </div>
+
       </main>
 
       {/* Cart Drawer Overlay & Panel */}
