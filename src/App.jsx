@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ShoppingBag, Heart } from 'lucide-react';
 import { PRODUCTS } from './data/products';
 import { ITEMS } from './data/items';
@@ -6,14 +6,28 @@ import ProductCard from './components/ProductCard';
 import CartDrawer from './components/CartDrawer';
 
 export default function App() {
-  // State 1: Drawer open/close status
+
+  // 1. STATES (Sabse pehle)
+  // Drawer open/close status
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // State 2: Cart items array
-  const [cart, setCart] = useState([]);
+  // Cart items array
+  // const [cart, setCart] = useState([]);
 
-  // Dono arrays ko combine kar lo:
-  const ALL_PRODUCTS = [...PRODUCTS, ...ITEMS];
+  // Cart State: LocalStorage se purana samaan load karo (agar ho), warna []
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem("shopsphere_cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  // Wishlist me save ki gayi product IDs ka array
+  // const [wishlist, setWishlist] = useState([]);
+
+  // Wishlist State: LocalStorage se purani saved IDs load karo, warna []
+  const [wishlist, setWishlist] = useState(() => {
+    const savedWishlist = localStorage.getItem("shopsphere_wishlist");
+    return savedWishlist ? JSON.parse(savedWishlist) : [];
+  });
 
   const [selectedCategory, setSelectedCategory] = useState("All");
 
@@ -22,9 +36,10 @@ export default function App() {
   // State for Sorting (default value: "default")
   const [sortBy, setSortBy] = useState("default");
 
-  // State: Wishlist me save ki gayi product IDs ka array
-  const [wishlist, setWishlist] = useState([]);
-
+  // 2. DATA PIPELINE & CALCULATIONS (Beech me)
+  // Dono arrays ko combine kar lo:
+  const ALL_PRODUCTS = [...PRODUCTS, ...ITEMS];
+  
   // Unique categories nikalne ke liye Set ka use
   const categories = ["All", ...new Set(ALL_PRODUCTS.map((p) => p.category))];
 
@@ -51,6 +66,9 @@ export default function App() {
     return 0; // "default" par koi chhed-chhad nahi, jaisa hai waisa hi rahe
   });
 
+  const totalCartBadgeCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+
+  // 3. EVENT HANDLERS (Buttons ke functions)
   // Handler: Cart me product add karna
   const handleAddToCart = (product) => {
     setCart((prevCart) => {
@@ -101,7 +119,16 @@ export default function App() {
     });
   };
 
-  const totalCartBadgeCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+  // 4. USE EFFECT (YAHAN LIKHTE HAIN - RETURN SE THEEK PEHLE)
+  // Side-Effect 1: Jab-jab 'cart' array badle, use localStorage me save kar do
+  useEffect(() => {
+    localStorage.setItem("shopsphere_cart", JSON.stringify(cart));
+  }, [cart]);
+
+  // Side-Effect 2: Jab-jab 'wishlist' array badle, use localStorage me save kar do
+  useEffect(() => {
+    localStorage.setItem("shopsphere_wishlist", JSON.stringify(wishlist));
+  }, [wishlist]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
