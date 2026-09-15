@@ -4,12 +4,16 @@ import { PRODUCTS } from './data/products';
 import { ITEMS } from './data/items';
 import ProductCard from './components/ProductCard';
 import CartDrawer from './components/CartDrawer';
+import WishlistDrawer from './components/WishlistDrawer';
 
 export default function App() {
 
   // 1. STATES (Sabse pehle)
   // Drawer open/close status
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // A. Nayi state drawer open/close ke liye
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 
   // Cart items array
   // const [cart, setCart] = useState([]);
@@ -39,6 +43,11 @@ export default function App() {
   // 2. DATA PIPELINE & CALCULATIONS (Beech me)
   // Dono arrays ko combine kar lo:
   const ALL_PRODUCTS = [...PRODUCTS, ...ITEMS];
+
+  // B. Derived list: IDs se full product details extract karna:
+  const wishlistedProducts = ALL_PRODUCTS.filter((item) =>
+    wishlist.includes(item.id)
+  );
   
   // Unique categories nikalne ke liye Set ka use
   const categories = ["All", ...new Set(ALL_PRODUCTS.map((p) => p.category))];
@@ -119,6 +128,12 @@ export default function App() {
     });
   };
 
+  // C. Move to cart handler:
+  const handleMoveToCart = (product) => {
+    handleAddToCart(product);
+    handleToggleWishlist(product.id);
+  };
+
   // 4. USE EFFECT (YAHAN LIKHTE HAIN - RETURN SE THEEK PEHLE)
   // Side-Effect 1: Jab-jab 'cart' array badle, use localStorage me save kar do
   useEffect(() => {
@@ -143,20 +158,21 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Wishlist Indicator Button */}
-          <div className="flex items-center gap-1.5 bg-rose-50 text-rose-600 px-3 py-2 rounded-lg text-sm font-semibold border border-rose-100">
-            <Heart size={18} className={wishlist.length > 0 ? "fill-rose-500 text-rose-500" : "text-rose-400"} />
-            <span>Wishlist</span>
-            <span className="bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full font-bold ml-1">
-              {wishlist.length}
-            </span>
-          </div>
+            {/* Wishlist Trigger Button */}
+            <button
+              onClick={() => setIsWishlistOpen(true)}
+              className="flex items-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-2 rounded-lg text-sm font-semibold border border-rose-100 transition active:scale-95 cursor-pointer">
+              <Heart size={18} className={wishlist.length > 0 ? "fill-rose-500 text-rose-500" : "text-rose-400"} />
+              <span>Wishlist</span>
+              <span className="bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full font-bold ml-1">
+                {wishlist.length}
+              </span>
+            </button>
         
           {/* Cart Trigger Button */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition flex items-center gap-2 shadow-sm active:scale-95"
-          >
+            className="relative bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition flex items-center gap-2 shadow-sm active:scale-95">
             <ShoppingBag size={18} />
             <span>Cart</span>
             <span className="bg-indigo-500 text-xs px-2 py-0.5 rounded-full font-bold ml-1">
@@ -263,6 +279,15 @@ export default function App() {
         cartItems={cart}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
+      />
+
+      {/* Wishlist Drawer */}
+      <WishlistDrawer
+        isOpen={isWishlistOpen}
+        onClose={() => setIsWishlistOpen(false)}
+        wishlistItems={wishlistedProducts}
+        onRemoveFromWishlist={handleToggleWishlist}
+        onMoveToCart={handleMoveToCart}
       />
 
     </div>
