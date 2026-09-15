@@ -153,7 +153,7 @@ export default function App() {
         <div className="flex items-center gap-2">
           <ShoppingBag className="text-indigo-600" size={26} />
           <span className="text-xl font-bold tracking-tight text-slate-800">
-            ShopSphere
+            Pandey E-Store
           </span>
         </div>
 
