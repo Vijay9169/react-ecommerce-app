@@ -150,8 +150,19 @@ export default function App() {
       {/* Top Navbar */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-10 shadow-sm flex items-center justify-between">
         
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <ShoppingBag className="text-indigo-600" size={26} />
+          <span className="text-xl font-bold tracking-tight text-slate-800">
+            ShopSphere
+          </span>
+        </div> */}
+
+        <div className="flex items-center gap-2">
+          <img 
+            src="/logo.png" 
+            alt="Pandey E-Store Logo" 
+            className="h-14 w-auto object-contain"
+          />
           <span className="text-xl font-bold tracking-tight text-slate-800">
             Pandey E-Store
           </span>
