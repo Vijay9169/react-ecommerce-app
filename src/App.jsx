@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ShoppingBag, Heart } from 'lucide-react';
-import { PRODUCTS } from './data/products';
-import { ITEMS } from './data/items';
+// import { PRODUCTS } from './data/products';
+// import { ITEMS } from './data/items';
 import ProductCard from './components/ProductCard';
 import CartDrawer from './components/CartDrawer';
 import WishlistDrawer from './components/WishlistDrawer';
@@ -160,28 +160,63 @@ export default function App() {
   }, [wishlist]);
 
   // Side-Effect 3: Component load hone par ek baar server/database se products data fetch karna
+  // useEffect(() => {
+  //   const fetchProductsFromDatabase = async () => {
+  //     try {
+  //       setIsLoading(true);
+  //       setError(null);
+  
+  //       // Mock Server Delay (2 second artificial wait)
+  //       await new Promise((resolve) => setTimeout(resolve, 2000));
+  
+  //       // Raw static sources combine kiye (Real backend aane par API response replace hoga)
+  //       const combinedData = [...PRODUCTS, ...ITEMS];
+  
+  //       setProducts(combinedData);
+  //     } catch (err) {
+  //       setError("Products load karne me samasya aayi. Kripya dobara koshish karein!");
+  //     } finally {
+  //       setIsLoading(false); // Spinner off karna
+  //     }
+  //   };
+  
+  //   fetchProductsFromDatabase();
+  // }, []); // Empty dependency array: Sirf Component Mount par ek baar chalega
+
+  // Backend Connet
+  // Real Backend API Call (MongoDB Atlas -> Express -> React)
   useEffect(() => {
-    const fetchProductsFromDatabase = async () => {
+    const fetchProductsFromBackend = async () => {
       try {
         setIsLoading(true);
         setError(null);
-  
-        // Mock Server Delay (2 second artificial wait)
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-  
-        // Raw static sources combine kiye (Real backend aane par API response replace hoga)
-        const combinedData = [...PRODUCTS, ...ITEMS];
-  
-        setProducts(combinedData);
+
+        // Express backend route ko call kiya
+        const response = await fetch('http://localhost:5000/api/products');
+
+        if (!response.ok) {
+          throw new Error(`Server returned status: ${response.status}`);
+        }
+
+        const jsonResult = await response.json();
+
+        // MongoDB ki '_id' ko standard 'id' me map kiya
+        const mappedProducts = jsonResult.data.map((item) => ({
+          ...item,
+          id: item._id, // Existing components (Cart, Wishlist, Cards) 'item.id' expect karte hain
+        }));
+
+        setProducts(mappedProducts);
       } catch (err) {
-        setError("Products load karne me samasya aayi. Kripya dobara koshish karein!");
+        console.error('API Fetch Error:', err);
+        setError('Backend server se product load nahi ho paye. Please verify backend is running.');
       } finally {
-        setIsLoading(false); // Spinner off karna
+        setIsLoading(false);
       }
     };
-  
-    fetchProductsFromDatabase();
-  }, []); // Empty dependency array: Sirf Component Mount par ek baar chalega
+
+    fetchProductsFromBackend();
+  }, []);
 
 
   // =========================================================================
