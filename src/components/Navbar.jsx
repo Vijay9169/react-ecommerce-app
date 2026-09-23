@@ -31,12 +31,12 @@ export default function Navbar({
             <img
               src="/logo.png"
               alt="Logo"
-              className="w-8 h-8 object-contain rounded"
+              className="w-14 h-14 object-contain rounded"
               onError={(e) => {
                 e.target.style.display = 'none';
               }}
             />
-            <span className="text-xl font-black tracking-tight text-gray-900">
+            <span className="text-xl font-black tracking-tight text-green-600">
               Pandey <span className="text-blue-600">E-Store</span>
             </span>
           </div>

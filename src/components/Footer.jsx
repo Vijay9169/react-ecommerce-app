@@ -57,9 +57,9 @@ export default function Footer() {
             <img 
               src="/logo.png" 
               alt="Logo" 
-              className="w-8 h-8 object-contain rounded"
+              className="w-10 h-10 object-contain rounded"
             />
-            <span className="text-xl font-bold tracking-tight text-white">
+            <span className="text-xl font-bold tracking-tight text-green-600">
               Pandey <span className="text-blue-500">E-Store</span>
             </span>
           </div>
